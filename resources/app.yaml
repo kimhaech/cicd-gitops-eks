@@ -24,7 +24,7 @@ spec:
                 - ng-6      
       containers: # pod다. 컨테이너에 대한 정보
       - name: client-app
-        image: 686710509719.dkr.ecr.ap-northeast-2.amazonaws.com/team-6:20231016161113
+        image: 686710509719.dkr.ecr.ap-northeast-2.amazonaws.com/team-6:main-3bf20db69a2274d06f459eccc086fc19c39373bd
         imagePullPolicy: IfNotPresent
         resources:
           requests: # 컨테이너가 어떤 자원을 가지는지 설정 -> 필요한대로 임의대로 설정하기

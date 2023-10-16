@@ -37,7 +37,7 @@ apiVersion: v1
 kind: Service # 네트워크 설정이라고 할 수 있다.
 metadata:
   name: client-service
-  namespace: team-1
+  namespace: team-6
 spec:
   type: NodePort # 고정된 포트를 갖는다.
   selector:

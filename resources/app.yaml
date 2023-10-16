@@ -1,18 +1,18 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: Deployment # replicaset을 관리한다. (pod를 여러개 가짐)
 metadata:
   name: client-app
-  namespace: kdb
+  namespace: team-6
 spec:
-  replicas: 1
+  replicas: 1 # 프론트 -> 하나만
   selector:
-    matchLabels:
+    matchLabels: # 위의 metadata와 매치 시켜주는 것
       app: client-app
-  template:
+  template: # 여러개를 만들 수 있는 하나의 틀 -> template - pod의 템플릿
     metadata:
-      labels:
+      labels: # 이런 이름으로 붙여준다.
         app: client-app
-    spec:
+    spec: # 여기서 부터 중요 - namespace로 자원을 분류한 상태인데 -> 여기서 각자 배정한 노드에 우리의 서비스를 배포해야한다.
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -20,30 +20,30 @@ spec:
             - matchExpressions:
               - key: alpha.eksctl.io/nodegroup-name
                 operator: In
-                values:
-                - ng-5      
-      containers:
+                values: # node group에 배포하기 위해서 설정 -> 6조 - ng-6 -> 배포할때 설정해야한다.
+                - ng-6      
+      containers: # pod다. 컨테이너에 대한 정보
       - name: client-app
-        image: 686710509719.dkr.ecr.ap-northeast-2.amazonaws.com/pda-project:20231016161113
+        image: 686710509719.dkr.ecr.ap-northeast-2.amazonaws.com/team-6:20231016161113
         imagePullPolicy: IfNotPresent
         resources:
-          requests:
+          requests: # 컨테이너가 어떤 자원을 가지는지 설정 -> 필요한대로 임의대로 설정하기
             cpu: "100m"
             memory: "128Mi"
-        ports:
+        ports: # 컨테이너가 갖는 포트
         - containerPort: 80
 --- 
 apiVersion: v1
-kind: Service
+kind: Service # 네트워크 설정이라고 할 수 있다.
 metadata:
   name: client-service
-  namespace: kdb
+  namespace: team-1
 spec:
-  type: NodePort
+  type: NodePort # 고정된 포트를 갖는다.
   selector:
     app: client-app
   ports:
   - name: http
     protocol: TCP
     port: 80
-    targetPort: 80
+    targetPort: 80 # 위의 컨테이너가 갖는 포트로 연결하는걸 지정

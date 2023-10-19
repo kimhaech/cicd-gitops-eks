@@ -1,17 +1,17 @@
 apiVersion: apps/v1
 kind: Deployment # replicaset을 관리한다. (pod를 여러개 가짐) - 
 metadata:
-  name: client-app # Deployment의 이름 -> 의미있게
+  name: server-app # Deployment의 이름 -> 의미있게
   namespace: team-6
 spec: # Deployment의 spec
-  replicas: 1 # 프론트 -> 하나만 - pod를 하나만 띄우는 것
+  replicas: 1 # 백 레플리카 1 
   selector:
     matchLabels: # 위의 metadata와 매치 시켜주는 것
-      app: client-app
+      app: server-app
   template: # 여러개를 만들 수 있는 하나의 틀 -> template - pod의 템플릿 - replicaset은 pod를 여러개 띄운다(보통 같은 것)
     metadata:
       labels: # 이런 이름으로 붙여준다.
-        app: client-app
+        app: server-app
     spec: # 여기서 부터 중요 - pod의 spec - namespace로 자원을 분류한 상태인데 -> 여기서 각자 배정한 노드에 우리의 서비스를 배포해야한다.
       affinity:
         nodeAffinity:
@@ -23,27 +23,27 @@ spec: # Deployment의 spec
                 values: # node group에 배포하기 위해서 설정 -> 6조 - ng-6 -> 배포할때 설정해야한다.
                 - ng-6      
       containers: # pod다. 컨테이너에 대한 정보
-      - name: client-app
-        image: 686710509719.dkr.ecr.ap-northeast-2.amazonaws.com/team-6:front-20231019223443 # ecr주소:team-6뒤에는이미지 이름
+      - name: server-app
+        image: 686710509719.dkr.ecr.ap-northeast-2.amazonaws.com/team-6:back-20231020052933 # ecr주소:team-6뒤에는이미지 이름
         imagePullPolicy: IfNotPresent
         resources:
           requests: # 컨테이너가 어떤 자원을 가지는지 설정 -> 필요한대로 설정하기
             cpu: "100m"
             memory: "128Mi"
         ports: # 컨테이너가 갖는 포트 - 컨테이너가 사용할 포트번호
-        - containerPort: 3000
+        - containerPort: 8080
 --- 
 apiVersion: v1
 kind: Service # 네트워크 설정이라고 할 수 있다.
 metadata: # 리소스에 대한
-  name: client-service
+  name: server-service
   namespace: team-6 # 사용할 namespace
 spec:
   type: NodePort # 고정된 포트를 갖는다. - type이 없으면 클러스터 ip이다.
   selector: # pod(pod의 label)와 서비스를 연결한다. (연결할 앱이라고 생각)
-    app: client-app
+    app: server-app
   ports:
   - name: http
     protocol: TCP
-    port: 80  # 서비스의 포트 (서비스로 접근하는 포트)
-    targetPort: 3000 # 위의 컨테이너가 갖는 포트로 연결하는걸 지정 - 접근하려고 하는 포트
+    port: 8080  # 서비스의 포트 (서비스로 접근하는 포트)
+    targetPort: 8080 # 위의 컨테이너가 갖는 포트로 연결하는걸 지정 - 접근하려고 하는 포트

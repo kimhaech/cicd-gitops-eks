@@ -24,7 +24,7 @@ spec: # Deployment의 spec
                 - ng-6      
       containers: # pod다. 컨테이너에 대한 정보
       - name: client-app
-        image: 686710509719.dkr.ecr.ap-northeast-2.amazonaws.com/team-6:front-20231019223443 # ecr주소:team-6뒤에는이미지 이름
+        image: 686710509719.dkr.ecr.ap-northeast-2.amazonaws.com/team-6:front-20231019165038 # ecr주소:team-6뒤에는이미지 이름
         imagePullPolicy: IfNotPresent
         resources:
           requests: # 컨테이너가 어떤 자원을 가지는지 설정 -> 필요한대로 설정하기
@@ -32,18 +32,3 @@ spec: # Deployment의 spec
             memory: "128Mi"
         ports: # 컨테이너가 갖는 포트 - 컨테이너가 사용할 포트번호
         - containerPort: 3000
---- 
-apiVersion: v1
-kind: Service # 네트워크 설정이라고 할 수 있다.
-metadata: # 리소스에 대한
-  name: client-service
-  namespace: team-6 # 사용할 namespace
-spec:
-  type: NodePort # 고정된 포트를 갖는다. - type이 없으면 클러스터 ip이다.
-  selector: # pod(pod의 label)와 서비스를 연결한다. (연결할 앱이라고 생각)
-    app: client-app
-  ports:
-  - name: http
-    protocol: TCP
-    port: 80  # 서비스의 포트 (서비스로 접근하는 포트)
-    targetPort: 3000 # 위의 컨테이너가 갖는 포트로 연결하는걸 지정 - 접근하려고 하는 포트
